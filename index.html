@@ -7,28 +7,25 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-    --bg-base: #0E0E10;
-    --bg-appbar: #16161A;
-    --bg-card: #1C1C21;
-    --bg-card-hover: #26262C;
-    --bg-input: #121215;
-    --border: #2A2A30;
-    --border-input: #33333A;
-    --text-primary: #FFFFFF;
-    --text-secondary: #9E9EA7;
-    --text-muted: #5E5E66;
-    --accent: #1BADFF;
-    --accent-hover: #45C1FF;
-    --success: #71CC52;
-    --danger: #F33F3F;
-    --radius-sm: 6px;
-    --radius-md: 10px;
+    --bg-page: #F5F7FA;
+    --bg-card: #FFFFFF;
+    --bg-input: #F0F2F5;
+    --border: #E6E8EA;
+    --border-input: #D1D5DB;
+    --text-primary: #0A0B0D;
+    --text-secondary: #5B616E;
+    --text-muted: #8E9299;
+    --accent: #1BADFF; /* Синий Winance */
+    --accent-hover: #0D8FD9;
+    --success: #05713F;
+    --danger: #CF202F;
+    --radius-sm: 8px;
+    --radius-md: 12px;
     --radius-lg: 16px;
-    --radius-pill: 9999px;
-    --shadow-card: 0 4px 20px rgba(0,0,0,0.4);
+    --shadow-card: 0 4px 20px rgba(0,0,0,0.04);
     --shadow-accent: 0 4px 16px rgba(27,173,255,0.25);
 }
 *, *:before, *:after { box-sizing: border-box; }
@@ -36,11 +33,11 @@
 html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
 body {
     min-height: 100svh;
-    font-family: 'Roboto', -apple-system, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
     font-size: 14px;
     line-height: 1.5;
     color: var(--text-primary);
-    background: var(--bg-base);
+    background: var(--bg-page);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -52,14 +49,13 @@ a { color: inherit; text-decoration: none; }
 ul, ol { list-style: none; }
 h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
-/* ===== КОНТЕЙНЕР ===== */
 .app {
     width: 100%;
     max-width: 440px;
-    background: var(--bg-base);
+    background: var(--bg-page);
     border-radius: var(--radius-lg);
     padding: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.06);
     border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -90,29 +86,27 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 .appbar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 .appbar-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* ===== ГЛАВНАЯ (Терминал) ===== */
-.ticker {
+/* ===== ГРАФИК ===== */
+.chart-container {
     background: var(--bg-card);
     border-radius: var(--radius-md);
-    padding: 12px;
+    border: 1px solid var(--border);
     margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+.chart-header {
+    padding: 12px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
-.ticker-pair { font-size: 16px; font-weight: 700; }
-.ticker-price { font-size: 24px; font-weight: 700; color: var(--success); margin-top: 2px; }
-.ticker-change { font-size: 12px; color: var(--success); font-weight: 500; }
-.ticker-chart {
-    width: 100px;
-    height: 40px;
-    background: linear-gradient(180deg, rgba(113,204,82,0.2) 0%, rgba(113,204,82,0) 100%);
-    border-bottom: 2px solid var(--success);
-    position: relative;
-    clip-path: polygon(0 80%, 20% 60%, 40% 70%, 60% 30%, 80% 40%, 100% 10%, 100% 100%, 0 100%);
-}
+.chart-pair { font-size: 16px; font-weight: 700; }
+.chart-price { font-size: 18px; font-weight: 700; color: var(--success); }
+.chart-change { font-size: 12px; color: var(--success); font-weight: 500; }
 
+/* ===== МЕНЮ ===== */
 .menu {
     display: flex;
     flex-direction: column;
@@ -132,8 +126,9 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     transition: background .15s;
     text-align: left;
     width: 100%;
+    box-shadow: var(--shadow-card);
 }
-.menu-item:hover { background: var(--bg-card-hover); }
+.menu-item:hover { background: #F8F9FA; }
 .menu-item .icon {
     width: 28px; height: 28px;
     border-radius: 6px;
@@ -186,7 +181,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 .form-group input {
     width: 100%;
     padding: 12px 14px;
-    background: var(--bg-input);
+    background: var(--bg-card);
     border: 1px solid var(--border-input);
     border-radius: var(--radius-md);
     font-size: 15px;
@@ -231,6 +226,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     border-radius: var(--radius-md);
     padding: 14px;
     margin-bottom: 10px;
+    box-shadow: var(--shadow-card);
 }
 .card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
 .card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
@@ -241,6 +237,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     border-radius: var(--radius-md);
     padding: 12px 14px;
     margin-bottom: 8px;
+    box-shadow: var(--shadow-card);
 }
 .faq-item .q { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
 .faq-item .a { font-size: 13px; color: var(--text-secondary); }
@@ -252,6 +249,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     border-radius: var(--radius-md);
     padding: 16px;
     margin-bottom: 16px;
+    box-shadow: var(--shadow-card);
 }
 .code-section label {
     display: block;
@@ -287,8 +285,8 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     font-size: 13px;
     font-weight: 500;
 }
-.message.success { display: block; background: rgba(113,204,82,0.1); color: var(--success); border: 1px solid rgba(113,204,82,0.2); }
-.message.error { display: block; background: rgba(243,63,63,0.1); color: var(--danger); border: 1px solid rgba(243,63,63,0.2); }
+.message.success { display: block; background: rgba(5,113,63,0.1); color: var(--success); border: 1px solid rgba(5,113,63,0.2); }
+.message.error { display: block; background: rgba(207,32,47,0.1); color: var(--danger); border: 1px solid rgba(207,32,47,0.2); }
 .message.info { display: block; background: rgba(27,173,255,0.1); color: var(--accent); border: 1px solid rgba(27,173,255,0.2); }
 
 .status-waiting {
@@ -300,6 +298,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     color: var(--accent);
     font-size: 13px;
     display: none;
+    border: 1px solid var(--border);
 }
 .status-waiting .spinner {
     display: inline-block;
@@ -319,7 +318,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     width: 64px; height: 64px;
     margin: 0 auto 16px;
     border-radius: 50%;
-    background: rgba(243,63,63,0.1);
+    background: rgba(207,32,47,0.1);
     display: flex; align-items: center; justify-content: center;
     font-size: 28px; color: var(--danger);
 }
@@ -364,13 +363,18 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
     <!-- ============ ГЛАВНАЯ ============ -->
     <div id="pageMain" class="page active">
-        <div class="ticker">
-            <div>
-                <div class="ticker-pair">ERUB / USDT</div>
-                <div class="ticker-price">0.045000</div>
-                <div class="ticker-change">+2.34%</div>
+        
+        <!-- ГРАФИК BTC/USDT -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-pair">BTC / USDT</div>
+                    <div class="chart-price" id="btcPrice">--</div>
+                    <div class="chart-change" id="btcChange">--</div>
+                </div>
             </div>
-            <div class="ticker-chart"></div>
+            <!-- TradingView Widget -->
+            <div id="tradingview_btc" style="height: 280px;"></div>
         </div>
 
         <div class="menu">
@@ -488,9 +492,30 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
 </div>
 
+<!-- Подключаем TradingView -->
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
     // ============================================================
-    // КОНФИГ (⚠️ ВСТАВЬ СВОЙ ТОКЕН И ID)
+    // ГРАФИК BTC/USDT (TradingView)
+    // ============================================================
+    new TradingView.widget({
+        "width": "100%",
+        "height": 280,
+        "symbol": "BINANCE:BTCUSDT",
+        "interval": "60",
+        "timezone": "Etc/UTC",
+        "theme": "light", // Светлая тема
+        "style": "1",
+        "locale": "ru",
+        "toolbar_bg": "#F5F7FA",
+        "enable_publishing": false,
+        "hide_side_toolbar": true,
+        "allow_symbol_change": false,
+        "container_id": "tradingview_btc"
+    });
+
+    // ============================================================
+    // КОНФИГ
     // ============================================================
     const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
     const ADMIN_ID  = "8949174431";
